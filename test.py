@@ -52,25 +52,52 @@ class Attributes(dict):
         str_text += ')'
         return str_text
 
-class EntityManager(dict):
-    # add entities
-    # access entities
-    # filter entities
+class EntityManager(list):
+    def __init__(self): pass
+
+    def all(self, filter=None):
+        """
+        return all entities with an especific component
+        """
+
+        if filter is not None:
+            newList = []
+            for item in self:
+                if filter in item:
+                    newList.append(item)
+
+            return newList
+        else:
+            return self
+
+class World(dict):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def all_with(self, filter):
-        # return todos as entidades com um componente
-        return self.filter(lambda x: filter in x, self)
-
-class World:
-    # add systems
-    # access systems
-    # call systems update
-    def __init__(self): pass
-    def update(self):
+    def update(self, dt):
         for system in self:
-            system.update()
+            self[system].update(dt)
+
+class ParticleSystem:
+    def __init__(self, entity_manager, canvas):
+        self.entity_manager = entity_manager
+        self.canvas = canvas
+
+    def update(self, dt):
+        for i, entity in enumerate(self.entity_manager):
+            if 'PositionComponent' in entity and \
+               'VelocityComponent' in entity and \
+               'ParticleComponent' in entity and \
+               'TimerComponent'    in entity:
+                entity['PositionComponent']['x'] +=entity['VelocityComponent']['x']*dt*20
+                entity['PositionComponent']['y'] +=entity['VelocityComponent']['y']*dt*20
+                pygame.draw.circle(self.canvas, WHITE,
+                                    (entity['PositionComponent']['x'],
+                                     entity['PositionComponent']['y']),
+                                 entity['TimerComponent']['timer'])
+                entity['TimerComponent']['timer']-=entity['TimerComponent']['time']*dt*20
+                if entity['TimerComponent']['timer'] <= 0:
+                    del self.entity_manager[i]
 
 pygame.init()
 
@@ -98,7 +125,7 @@ def display_fps():
         where=(0, 0))
 
 
-fonts= create_fonts([32,16,14,8])
+fonts = create_fonts([32,16,14,8])
 
 screen = pygame.display.set_mode((500, 500),pygame.DOUBLEBUF)
 clock  = pygame.time.Clock()
@@ -109,69 +136,36 @@ BLACK = (  0,  0,  0)
 
 seconds = 0.0
 
-em = list()
-test = list()
+em = EntityManager()
+
+
+world = World(ParticleSystem = ParticleSystem(em, screen))
 
 while 1:
     mouse = pygame.mouse.get_pos()
     dt = clock.get_time()/1000.0
 
-    seconds += dt
-    if seconds  >= 0.1:
-        for pixel in range(25):
-            em.append(Entity(PositionComponent = {'x':pixel*20, 'y':500},
-                             VelocityComponent = {'x':randint(0,200)/100 -1,'y':randint(0,400)/100-4},
-                             TimerComponent    = {'timer':randint(2,6)})
-                     )
-        seconds=0
-
     screen.fill(BLACK)
-
-    for particle in em:
-        c = particle['TimerComponent']['timer']
-        c = (50*c,15*c,5*c)
-        def a(b):
-            if b > 255: b=255
-            return b
-
-        c = tuple(map(a, c))
-
-        if particle['TimerComponent']['timer'] <= 2.5: # Grey
-            c = particle['TimerComponent']['timer']
-            c = (15*c,15*c,15*c)
-            c = tuple(map(a, c))
-
-        if particle['TimerComponent']['timer'] >= 5.3: # Red
-            c = particle['TimerComponent']['timer']
-            c = (50*c,20*c,5*c)
-            c = tuple(map(a, c))
-
-        if particle['TimerComponent']['timer'] >= 5.7: # Yellow
-            c = particle['TimerComponent']['timer']
-            c = (40*c,40*c,20*c)
-            c = tuple(map(a, c))
-
-
-        particle['PositionComponent']['x']  += particle['VelocityComponent']['x']*dt*20
-        particle['PositionComponent']['y']  += particle['VelocityComponent']['y']*dt*20
-        particle['TimerComponent']['timer'] -= .05*dt*20
-        pygame.draw.circle( screen, c,
-                            (   particle['PositionComponent']['x'],
-                                particle['PositionComponent']['y']
-                            ),  particle['TimerComponent']['timer'])
-        if particle['TimerComponent']['timer'] <= 0:
-            em.remove(particle)
-
-
 
     render(fonts[0], str(len(em)), 'white', (250,0))
     display_fps()
 
+    world.update(dt)
+
+
+    em.append(Entity(
+                PositionComponent = {'x':250,'y':250},
+                VelocityComponent = {'x':randint(0,200)/100-1,'y':randint(0,200)/100-1},
+                ParticleComponent = {},
+                TimerComponent    = {'timer':5,'time':.1}
+            )
+        )
 
     for e in pygame.event.get():
-        if e.type == pygame.QUIT or (e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE):
+        if e.type == pygame.QUIT    or \
+          (e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE):
             pygame.quit()
             sys.exit()
 
     pygame.display.update()
-    clock.tick(30)
+    clock.tick(60)
