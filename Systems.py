@@ -1,25 +1,68 @@
 import pygame
+import os
 class ParticleSystem:
     def __init__(self, entity_manager, canvas):
         self.entity_manager = entity_manager
         self.canvas = canvas
 
     def update(self, dt):
-        for i, entity in enumerate(self.entity_manager):
-            if 'PositionComponent' in entity and \
-               'VelocityComponent' in entity and \
-               'ParticleComponent' in entity and \
-               'TimerComponent'    in entity:
-                entity['PositionComponent']['x'] +=entity['VelocityComponent']['x']*dt*20
-                entity['PositionComponent']['y'] +=entity['VelocityComponent']['y']*dt*20
+        for id in self.entity_manager.all('ParticleComponent'):
+            if 'PositionComponent' in self.entity_manager[id].keys() and \
+               'VelocityComponent' in self.entity_manager[id].keys() and \
+               'ParticleComponent' in self.entity_manager[id].keys() and \
+               'TimerComponent'    in self.entity_manager[id].keys():
+                self.entity_manager[id]['PositionComponent']['x'] +=self.entity_manager[id]['VelocityComponent']['x']*dt*20
+                self.entity_manager[id]['PositionComponent']['y'] +=self.entity_manager[id]['VelocityComponent']['y']*dt*20
                 pygame.draw.circle(self.canvas, (255,255,255),
-                                    (entity['PositionComponent']['x'],
-                                     entity['PositionComponent']['y']),
-                                 entity['TimerComponent']['timer'])
+                                    (self.entity_manager[id]['PositionComponent']['x'],
+                                     self.entity_manager[id]['PositionComponent']['y']),
+                                 self.entity_manager[id]['TimerComponent']['timer'])
 
-                entity['VelocityComponent']['x'] *= 0.99
-                entity['VelocityComponent']['y'] *= 0.99
+                self.entity_manager[id]['VelocityComponent']['x'] *= 0.99
+                self.entity_manager[id]['VelocityComponent']['y'] *= 0.99
 
-                entity['TimerComponent']['timer']-=entity['TimerComponent']['time']*dt*20
-                if entity['TimerComponent']['timer'] <= 0:
-                    del self.entity_manager[i]
+                self.entity_manager[id]['TimerComponent']['timer']-=self.entity_manager[id]['TimerComponent']['time']*dt*20
+                if self.entity_manager[id]['TimerComponent']['timer'] <= 0:
+                    del self.entity_manager[id]
+
+class ControlSystem:
+    def __init__(self, entity_manager):
+        self.entity_manager = entity_manager
+        self.dirX = 0
+        self.dirY = 0
+
+    def update(self, dt):
+        for i, entity in enumerate(self.entity_manager.values()):
+            if 'ControllerComponent' in entity:
+                if 'PositionComponent'  in entity and \
+                   'VelocityComponent'  in entity and \
+                   'DirectionComponent' in entity:
+
+                    entity['DirectionComponent']['y'] = pygame.key.get_pressed()[pygame.K_s] - pygame.key.get_pressed()[pygame.K_w]
+
+                    entity['DirectionComponent']['x'] = pygame.key.get_pressed()[pygame.K_d] - pygame.key.get_pressed()[pygame.K_a]
+
+                    dir = entity['DirectionComponent']
+
+
+                    if self.dirX != dir['x'] or self.dirY != dir['y']:
+                        # os.system('cls')
+
+                        self.dirX=dir['x']
+                        self.dirY=dir['y']
+
+                        text = ' ⤬ \n⤬⤬⤬'
+                        #       0123 456
+                        text = list(text)
+                        print(dir)
+
+                        if dir['y'] == -1: text[1] = 'w'
+                        if dir['x'] == -1: text[4] = 'a'
+                        if dir['y'] ==  1: text[5] = 's'
+                        if dir['x'] ==  1: text[6] = 'd'
+
+                        text=''.join(text)
+                        print(text)
+
+# class MoveSystem:
+# class RenderSystem:

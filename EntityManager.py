@@ -16,7 +16,7 @@
 #         for entity in self.entities:
 #             entity.update()
 
-class EntityManager(list):
+class EntityManager(dict):
     def __init__(self): pass
 
     def all(self, filter=None):
@@ -25,11 +25,11 @@ class EntityManager(list):
         """
 
         if filter is not None:
-            newList = []
-            for item in self:
-                if filter in item:
-                    newList.append(item)
+            newDict = {}
+            for id in self:
+                if filter in self[id]:
+                    newDict[id]=self[id]
 
-            return newList
+            return newDict
         else:
             return self

@@ -1,8 +1,8 @@
-import pygame, sys
+import pygame, sys, os
 from random        import randint
 from Entity        import Entity
 from EntityManager import EntityManager
-from Systems       import ParticleSystem
+from Systems       import ControlSystem, ParticleSystem
 from World         import World
 from text          import create_fonts, render, display_fps
 
@@ -37,6 +37,23 @@ BLACK   = (  0,  0,  0)
 # Initialize pygame ------------------------------------------------------------
 pygame.init()
 
+# os.system('cls')
+
+
+
+
+
+id = '-1'
+def next_id():
+    global id
+    id = str(int(id)+1)
+    return id
+
+
+
+
+
+
 
 screen = pygame.display.set_mode((500, 500),pygame.DOUBLEBUF)
 clock  = pygame.time.Clock()
@@ -45,8 +62,15 @@ pygame.event.set_allowed([pygame.QUIT,pygame.KEYDOWN,pygame.KEYUP])
 
 # Initialize Entity Component System -------------------------------------------
 em    = EntityManager()
-world = World(ParticleSystem = ParticleSystem(em, screen))
+world = World(ControlSystem  = ControlSystem (em),
+              ParticleSystem = ParticleSystem(em, screen))
 
+em[next_id()] = Entity(ControllerComponent = {},
+                     SpriteComponent     = 'player.png',
+                     PositionComponent   = {'x':0,'y':0},
+                     VelocityComponent   = {'x':0,'y':0},
+                     DirectionComponent  = {'x':0,'y':0},
+                    )
 
 # Begin main game loop ---------------------------------------------------------
 while 1:
@@ -64,15 +88,15 @@ while 1:
     display_fps(fonts[0], clock, screen)
 
 
+    em[next_id()]=Entity(PositionComponent = {'x':250,'y':250},
+                         VelocityComponent = {'x':randint(-360,360)/180,'y':randint(-360,360)/180},
+                         ParticleComponent = True,
+                         TimerComponent    = {'timer':5, 'time':.1})
+
+
+
     # Update every system ------------------------------------------------------
     world.update(dt)
-
-
-    em.append(Entity(PositionComponent = {'x':250,'y':250},
-                     VelocityComponent = {'x':randint(0,3200)/100-32/2,
-                                          'y':randint(0,3200)/100-32/2},
-                     ParticleComponent = {},
-                     TimerComponent    = {'timer':5,'time':.1}))
 
     # Handle pygame events -----------------------------------------------------
     for e in pygame.event.get():
