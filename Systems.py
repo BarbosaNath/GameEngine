@@ -1,5 +1,7 @@
 import pygame
 import os
+
+# Particle System --------------------------------------------------------------
 class ParticleSystem:
     def __init__(self, entity_manager, canvas):
         self.entity_manager = entity_manager
@@ -25,6 +27,8 @@ class ParticleSystem:
                 if self.entity_manager[id]['TimerComponent']['timer'] <= 0:
                     del self.entity_manager[id]
 
+
+# Control System ---------------------------------------------------------------
 class ControlSystem:
     def __init__(self, entity_manager):
         self.entity_manager = entity_manager
@@ -44,7 +48,6 @@ class ControlSystem:
 
                     dir = entity['DirectionComponent']
 
-
                     if self.dirX != dir['x'] or self.dirY != dir['y']:
                         # os.system('cls')
 
@@ -54,7 +57,6 @@ class ControlSystem:
                         text = ' ⤬ \n⤬⤬⤬'
                         #       0123 456
                         text = list(text)
-                        print(dir)
 
                         if dir['y'] == -1: text[1] = 'w'
                         if dir['x'] == -1: text[4] = 'a'
@@ -62,7 +64,10 @@ class ControlSystem:
                         if dir['x'] ==  1: text[6] = 'd'
 
                         text=''.join(text)
-                        print(text)
+
+                    debugLog.edit_line(1,'text',text)
+
+
 
 # class MoveSystem:
 # class RenderSystem:
