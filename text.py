@@ -11,7 +11,7 @@ def create_fonts(font='Arial', sizes=[16]):
 
 def render(font, what, color, where, canvas):
     """Renders the fonts as passed from display_fps"""
-    text_to_show = font.render(what, 0, pygame.Color(color))
+    text_to_show = font.render(what, 1, pygame.Color(color))
     canvas.blit(text_to_show, where)
 
 

@@ -27,8 +27,8 @@ screen = pygame.display.set_mode((500, 500),pygame.DOUBLEBUF)
 clock  = pygame.time.Clock()
 pygame.event.set_allowed([pygame.QUIT,pygame.KEYDOWN,pygame.KEYUP])
 
-debugLog.add_line(f'fps: {int(clock.get_fps())}')
-debugLog.add_line(f'Teste')
+debugLog.add_line(f'$#A3F$FPS$#fff$: {int(clock.get_fps())}', fixed=True, id='fps')
+# debugLog.add_line(f'Teste')
 
 # Available ID Generator -------------------------------------------------------
 # id = '-1'
@@ -44,12 +44,12 @@ debugLog.add_line(f'Teste')
 #               ParticleSystem = ParticleSystem(em, screen))
 
 # Player -----------------------------------------------------------------------
-# em[next_id()] = Entity(ControllerComponent = {},
-#                        SpriteComponent     = 'player.png',
-#                        PositionComponent   = {'x':0,'y':0},
-#                        VelocityComponent   = {'x':0,'y':0},
-#                        DirectionComponent  = {'x':0,'y':0},
-#                       )
+# em.add(Entity(ControllerComponent = {},
+#               SpriteComponent     = 'player.png',
+#               PositionComponent   = {'x':0,'y':0},
+#               VelocityComponent   = {'x':0,'y':0},
+#               DirectionComponent  = {'x':0,'y':0},
+#              ) )
 
 # Begin main game loop ---------------------------------------------------------
 while 1:
@@ -73,8 +73,9 @@ while 1:
             sys.exit()
 
 
-    debugLog.edit_line(0,'text',f'FPS: {int(clock.get_fps())}')
-    debugLog.render(screen,(0,0))
+    debugLog.edit_line('fps','text',f'$#A3F$FPS$#FFF$: {int(clock.get_fps())}')
+    debugLog.render()
+    screen.blit(debugLog.canvas, (0,0))
 
     # Update and tick screen ---------------------------------------------------
     pygame.display.update()

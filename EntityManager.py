@@ -1,4 +1,3 @@
-from timeit import timeit
 class EntityManager(dict):
     def __init__(self):
         self.all       = dict()
@@ -15,8 +14,7 @@ class EntityManager(dict):
 
 
         for component in entity:
-            try:
-                self.all[component].append(id)
+            try:self.all[component].append(id)
             except:
                 self.all[component]=list()
                 self.all[component].append(id)
@@ -37,16 +35,6 @@ class EntityManager(dict):
         except: return []
         for i, filter in enumerate(filters):
             if i != 0:
-                try:
-                    filtered = set(filtered).intersection(self.all[filter])
-                except:
-                    return []
+                try: filtered = set(filtered).intersection(self.all[filter])
+                except: return []
         return filtered
-
-test = EntityManager()
-test.add({'a':0,'b':1,'c':2})
-test.add({'a':0,'c':2})
-test.add({'b':1,'c':2})
-test.add({'a':0,'b':1})
-test.add({'a':0})
-print(test.filter(('a','b')))
