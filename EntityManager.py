@@ -1,14 +1,52 @@
+from timeit import timeit
 class EntityManager(dict):
-    def __init__(self): pass
+    def __init__(self):
+        self.all       = dict()
+        self.available = list()
+        self.id_count  = 0
 
-    def all(self, filter=None):
-        """ return all entities with an especific component """
+    def add(self, entity):
+        if self.available != []:
+            id = self.available[0]
+            del self.available[0]
+        else:
+            id = str(self.id_count)
+            self.id_count += 1
 
-        if filter is not None:
-            newDict = {}
-            for id in self:
-                if filter in self[id]:
-                    newDict[id]=self[id]
 
-            return newDict
-        else: return self
+        for component in entity:
+            try:
+                self.all[component].append(id)
+            except:
+                self.all[component]=list()
+                self.all[component].append(id)
+
+
+        self[id] = entity
+
+    def remove(self, id):
+        self.available.append(id)
+
+        for component in self[id]:
+            del self.all[component][self.all[component].index(id)]
+
+        del self[id]
+
+    def filter(self, filters):
+        try: filtered = self.all[filters[0]]
+        except: return []
+        for i, filter in enumerate(filters):
+            if i != 0:
+                try:
+                    filtered = set(filtered).intersection(self.all[filter])
+                except:
+                    return []
+        return filtered
+
+test = EntityManager()
+test.add({'a':0,'b':1,'c':2})
+test.add({'a':0,'c':2})
+test.add({'b':1,'c':2})
+test.add({'a':0,'b':1})
+test.add({'a':0})
+print(test.filter(('a','b')))

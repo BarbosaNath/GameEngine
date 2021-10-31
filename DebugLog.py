@@ -3,9 +3,10 @@ import text as Text
 
 
 class DebugLog:
-    def __init__(self, default_font=Text.arial[32]):
+    def __init__(self, default_font=Text.arial[32], space=32):
         self.lines = list()
         self.default_font = default_font
+        self.space = space
         self.updated = True
         # lines = [
         #          {'text': 'texto1', 'font': font}
@@ -26,7 +27,7 @@ class DebugLog:
     def render(self, canvas, position):
         if self.updated:
             for i, line in enumerate(self.lines):
-                Text.render(line['font'], line['text'], line['color'], (position[0],position[1]*(i+1)), canvas)
+                Text.render(line['font'], line['text'], line['color'], (position[0],position[1]+self.space*i), canvas)
             self.updated = False
 
 debugLog = DebugLog()

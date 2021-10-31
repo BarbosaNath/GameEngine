@@ -28,6 +28,7 @@ clock  = pygame.time.Clock()
 pygame.event.set_allowed([pygame.QUIT,pygame.KEYDOWN,pygame.KEYUP])
 
 debugLog.add_line(f'fps: {int(clock.get_fps())}')
+debugLog.add_line(f'Teste')
 
 # Available ID Generator -------------------------------------------------------
 # id = '-1'

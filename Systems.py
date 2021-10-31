@@ -11,7 +11,6 @@ class ParticleSystem:
         for id in self.entity_manager.all('ParticleComponent'):
             if 'PositionComponent' in self.entity_manager[id].keys() and \
                'VelocityComponent' in self.entity_manager[id].keys() and \
-               'ParticleComponent' in self.entity_manager[id].keys() and \
                'TimerComponent'    in self.entity_manager[id].keys():
                 self.entity_manager[id]['PositionComponent']['x'] +=self.entity_manager[id]['VelocityComponent']['x']*dt*20
                 self.entity_manager[id]['PositionComponent']['y'] +=self.entity_manager[id]['VelocityComponent']['y']*dt*20
