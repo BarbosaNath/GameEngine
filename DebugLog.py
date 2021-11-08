@@ -4,27 +4,36 @@ import text as Text
 
 
 class DebugLog:
-    def __init__(self, default_font=Text.arial[16], size=(200,200), font_color='#FFFFFF'):
+    def __init__(self, default_font=Text.arial[16], size=(200,200), font_color='#FFFFFF', max=100):
         self.lines = list()
         self.default_font = default_font
-        self.space = default_font.get_linesize()
-        self.canvas = pygame.Surface(size)
+        self.canvas = pygame.Surface(size, pygame.SRCALPHA)
+        # self.canvas.set_colorkey((0,0,0))
         self.canvas_size = size
         self.updated = True
         self.font_color = font_color
+        self.max = max
+
         # lines = [
         #          {'text': 'texto1', 'font': font, 'fixed': True},
         #          {'text': 'texto2', 'font': font}
         #         ]
-
         # color codes: $#000$text$
+
 
     def add_line(self, text, fixed=False, font=None, id=None):
         if font is None: font = self.default_font
-
         self.lines.append({'text':text,'font':font,'fixed':fixed,'id':id})
-
         self.updated = True
+
+        first_not_fixed = 0
+        if len(self.lines) > self.max:
+            for line in self.lines:
+                if self.lines[first_not_fixed]['fixed'] == False and\
+                    self.lines[first_not_fixed]['id'] is None:
+                    del self.lines[first_not_fixed]
+                    break
+                first_not_fixed += 1
 
     def edit_line(self, id, what, value):
         line = next((sub for sub in self.lines if sub['id'] == id), None)
@@ -68,5 +77,15 @@ class DebugLog:
             self.updated = False
 
 
-debugLog = DebugLog()
+        first_not_fixed = 0
+        if len(self.lines) > self.max:
+            for line in self.lines:
+                if self.lines[first_not_fixed]['fixed'] == False and\
+                    self.lines[first_not_fixed]['id'] is None:
+                    del self.lines[first_not_fixed]
+                    break
+                first_not_fixed += 1
+
+
+debugLog = DebugLog(max=10)
 debugLog.render()
