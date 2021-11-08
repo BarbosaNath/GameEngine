@@ -1,13 +1,14 @@
 import pygame
 import os
 from Entity import Entity
+from EntityManager import EntityManager
 from math import cos, sin
-import numpy as np
+# import numpy as np
 from random import randint
 
 # Particle System --------------------------------------------------------------
 class ParticleSystem:
-    def __init__(self, entity_manager, canvas):
+    def __init__(self, entity_manager: EntityManager, canvas: pygame.Surface):
         self.entity_manager = entity_manager
         self.canvas = canvas
 
@@ -17,9 +18,9 @@ class ParticleSystem:
                                               'VelocityComponent',
                                               'TimerComponent')):
 
-            self.entity_manager[id]['PositionComponent']['x'] +=self.entity_manager[id]['VelocityComponent']['x']*dt*20
-            self.entity_manager[id]['PositionComponent']['y'] +=self.entity_manager[id]['VelocityComponent']['y']*dt*20
-            pygame.draw.circle(self.canvas, (255,255,255),
+            self.entity_manager[id]['PositionComponent']['x'] +=self.entity_manager[id]['VelocityComponent']['x']*20*dt
+            self.entity_manager[id]['PositionComponent']['y'] +=self.entity_manager[id]['VelocityComponent']['y']*20*dt
+            pygame.draw.circle(self.canvas, (255,0,255),
                                 (self.entity_manager[id]['PositionComponent']['x'],
                                  self.entity_manager[id]['PositionComponent']['y']),
                                self.entity_manager[id]['TimerComponent']['timer'])
@@ -27,7 +28,7 @@ class ParticleSystem:
             self.entity_manager[id]['VelocityComponent']['x'] *= 0.99
             self.entity_manager[id]['VelocityComponent']['y'] *= 0.99
 
-            self.entity_manager[id]['TimerComponent']['timer']-=self.entity_manager[id]['TimerComponent']['time']*dt*20
+            self.entity_manager[id]['TimerComponent']['timer']-=self.entity_manager[id]['TimerComponent']['time']*20*dt
             if self.entity_manager[id]['TimerComponent']['timer'] <= 0:
                 self.entity_manager.remove(id)
 
@@ -72,7 +73,7 @@ class ParticleSystem:
 
 
 class ParticleSpawnerSystem:
-    def __init__(self, em):
+    def __init__(self, em: EntityManager):
         self.entity_manager = em
 
     def update(self, dt):
@@ -81,13 +82,14 @@ class ParticleSpawnerSystem:
 
 
             # Particle ---------------------------------------------------------
+            # if len(self.entity_manager) <= 50:
             self.entity_manager.add(
-                Entity(PositionComponent = {'x':e['Position']['x'],
-                                            'y':e['Position']['y']},
-                       VelocityComponent = {'x':randint(-16,16),
-                                            'y':randint(-16,16)},
-                       ParticleComponent = True,
-                       TimerComponent    = {'timer':6, 'time':.4}))
+                    Entity(PositionComponent = {'x':e['Position']['x'],
+                                                'y':e['Position']['y']},
+                           VelocityComponent = {'x':randint(-20,20)/10,
+                                                'y':randint(-12,0)-4},
+                           ParticleComponent = True,
+                           TimerComponent    = {'timer':10, 'time':.4}))
 
 # class MoveSystem:
 # class RenderSystem:
