@@ -5,7 +5,7 @@ from EntityManager import EntityManager
 from Systems       import *
 from World         import World
 from text          import create_fonts, render, display_fps
-from DebugLog      import debugLog
+from DebugLog      import debugLog, log_vars
 from postProcessing import Bloom
 from PIL import Image, ImageShow
 from config import config
@@ -22,17 +22,12 @@ GREY    = (50,50,50)
 acc     = '$#A3F$'
 white   = '$#FFF$'
 
-
-
-
 # Initialize pygame ------------------------------------------------------------
 pygame.init()
 os.system('cls')
 
 # Initialize Pygame Variables --------------------------------------------------
 screen_size = (500,500)
-
-
 screen = pygame.display.set_mode(screen_size, pygame.DOUBLEBUF)
 bloomLayer = pygame.Surface(screen_size, pygame.SRCALPHA)
 layer2 = pygame.Surface(screen_size, pygame.SRCALPHA)
@@ -40,54 +35,33 @@ clock  = pygame.time.Clock()
 pygame.event.set_allowed([pygame.QUIT,pygame.KEYDOWN,pygame.KEYUP])
 
 
-debugLog.add_line(f'{acc}FPS{acc}: {int(clock.get_fps())}', fixed=True, id='fps')
+debugLog.add_line('', fixed=True, id='fps')
 
 
 # Initialize Entity Component System -------------------------------------------
 em    = EntityManager()
 world = World()
 if config['particles'] != False:
+    world['ParticleSystem'] = ParticleSystem(em, bloomLayer, layer2)
     world['ParticleSpawnerSystem'] = ParticleSpawnerSystem(em)
-    world['ParticleSystem'       ] = ParticleSystem(em, bloomLayer, layer2)
 
 # Player -----------------------------------------------------------------------
-em.add(Entity(ControllerComponent = {},
-              SpriteComponent     = 'player.png',
-              PositionComponent   = {'x':0,'y':0},
-              VelocityComponent   = {'x':0,'y':0},
-              DirectionComponent  = {'x':0,'y':0},
-             ) )
+em.add(Entity(Controller = {},
+              Sprite     = 'player.png',
+              Position   = {'x':0,'y':0},
+              Velocity   = {'x':0,'y':0},
+              Direction  = {'x':0,'y':0}))
 
 em.add(Entity(ParticleSpawner = { 'range'   : [0,100],
                                   'arc'     : [0,360],
                                   'rotation': [0,360],
                                   'scale'   :      5},
-              Position        = {'x':250,'y':250},
-))
+              Position = {'x':0,'y':0}))
 
-# bloomSurface = bloomLayer
 # Begin main game loop ---------------------------------------------------------
-even=0
+frames=0
 world.update(10)
 while 1:
-    fpsText = f'{acc}FPS{white}: {int(clock.get_fps())}   $#3AF$|{acc}   Entities{white}: {len(em)}'
-
-    # Mouse variable for easy access -------------------------------------------
-    # mouse = pygame.mouse.get_pos()
-
-    # Delta Time variable ------------------------------------------------------
-    dt = clock.get_time()/1000.0
-
-    # Reset screens ------------------------------------------------------------
-    screen.fill(GREY)
-    # if even%2 != 0:
-    bloomLayer.fill((0, 0, 0, 0))
-    layer2.fill((0,0,0,0))
-
-    # Update every system ------------------------------------------------------
-    world.update(dt)
-
-    # Handle pygame events -----------------------------------------------------
     for e in pygame.event.get():
         if e.type == pygame.QUIT or \
           (e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE):
@@ -95,19 +69,36 @@ while 1:
             sys.exit()
 
 
-    debugLog.edit_line('fps', 'text', fpsText)
-    debugLog.render()
-    screen.blit(debugLog.canvas, (0,0))
+    # Mouse variable for easy access -------------------------------------------
+    mouse = pygame.mouse.get_pos()
+    em['1']['Position']['x'] = mouse[0]
+    em['1']['Position']['y'] = mouse[1]
+
+    # Delta Time variable ------------------------------------------------------
+    dt = clock.get_time()/1000.0
+
+    # Reset screens ------------------------------------------------------------
+    screen.fill(BLACK)
+    bloomLayer.fill((0, 0, 0, 0))
+    layer2.fill((0,0,0,0))
+
+    # Update every system ------------------------------------------------------
+    world.update(dt)
+
+    # Draw Particles and Bloom -------------------------------------------------
     if config['bloom']:
-        if even%config['bloom_rate'] == 0:
+        if frames%config['bloom_rate'] == 0:
             bloomSurface = Bloom(layer2)
-            # bloomSurface2 = Bloom(bloomLayer)
-        # screen.blit(layer2, (0,0))
         screen.blit(bloomSurface, (0,0))
     screen.blit(bloomLayer, (0,0))
+
+    # Render the debugLog ------------------------------------------------------
+    debugLog.edit_line('fps', 'text', log_vars( 'FPS', int(clock.get_fps()), 'Entities', len(em) ) )
+    if frames%10==0: debugLog.render()
+    screen.blit(debugLog.canvas, (0,0))
 
     # Update and tick screen ---------------------------------------------------
     pygame.display.update()
     clock.tick(config['fps'])
 
-    even+=1
+    frames+=1

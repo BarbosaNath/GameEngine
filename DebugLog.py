@@ -89,3 +89,12 @@ class DebugLog:
 
 debugLog = DebugLog(max=10)
 debugLog.render()
+
+acc     = '$#A3F$'
+acc2    = '$#3AF$'
+white   = '$#FFF$'
+
+def log_var(varname, var):
+    return f'{acc}{varname}{white}: {var}'
+def log_vars(varname1, var1, varname2, var2):
+    return f'{acc}{varname1}{white}: {var1}   {acc2}|{acc}   {varname2}{white}: {var2}'
