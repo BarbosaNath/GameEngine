@@ -7,9 +7,8 @@ from World         import World
 from text          import create_fonts, render, display_fps
 from DebugLog      import debugLog
 from postProcessing import Bloom
-import cv2
-# from PIL import Image
-
+from PIL import Image, ImageShow
+from config import config
 
 # Simple color access ----------------------------------------------------------
 WHITE   = 0xffffff
@@ -24,6 +23,8 @@ acc     = '$#A3F$'
 white   = '$#FFF$'
 
 
+
+
 # Initialize pygame ------------------------------------------------------------
 pygame.init()
 os.system('cls')
@@ -34,6 +35,7 @@ screen_size = (500,500)
 
 screen = pygame.display.set_mode(screen_size, pygame.DOUBLEBUF)
 bloomLayer = pygame.Surface(screen_size, pygame.SRCALPHA)
+layer2 = pygame.Surface(screen_size, pygame.SRCALPHA)
 clock  = pygame.time.Clock()
 pygame.event.set_allowed([pygame.QUIT,pygame.KEYDOWN,pygame.KEYUP])
 
@@ -43,8 +45,10 @@ debugLog.add_line(f'{acc}FPS{acc}: {int(clock.get_fps())}', fixed=True, id='fps'
 
 # Initialize Entity Component System -------------------------------------------
 em    = EntityManager()
-world = World(ParticleSystem        = ParticleSystem(em, bloomLayer),
-              ParticleSpawnerSystem = ParticleSpawnerSystem(em))
+world = World()
+if config['particles'] != False:
+    world['ParticleSpawnerSystem'] = ParticleSpawnerSystem(em)
+    world['ParticleSystem'       ] = ParticleSystem(em, bloomLayer, layer2)
 
 # Player -----------------------------------------------------------------------
 em.add(Entity(ControllerComponent = {},
@@ -64,7 +68,7 @@ em.add(Entity(ParticleSpawner = { 'range'   : [0,100],
 # bloomSurface = bloomLayer
 # Begin main game loop ---------------------------------------------------------
 even=0
-world.update(2)
+world.update(10)
 while 1:
     fpsText = f'{acc}FPS{white}: {int(clock.get_fps())}   $#3AF$|{acc}   Entities{white}: {len(em)}'
 
@@ -78,6 +82,7 @@ while 1:
     screen.fill(GREY)
     # if even%2 != 0:
     bloomLayer.fill((0, 0, 0, 0))
+    layer2.fill((0,0,0,0))
 
     # Update every system ------------------------------------------------------
     world.update(dt)
@@ -93,18 +98,16 @@ while 1:
     debugLog.edit_line('fps', 'text', fpsText)
     debugLog.render()
     screen.blit(debugLog.canvas, (0,0))
-    if even%2 == 0:
-        bloomSurface = Bloom(bloomLayer)
-    screen.blit(bloomSurface, (0,0))
+    if config['bloom']:
+        if even%config['bloom_rate'] == 0:
+            bloomSurface = Bloom(layer2)
+            # bloomSurface2 = Bloom(bloomLayer)
+        # screen.blit(layer2, (0,0))
+        screen.blit(bloomSurface, (0,0))
     screen.blit(bloomLayer, (0,0))
 
     # Update and tick screen ---------------------------------------------------
     pygame.display.update()
-    clock.tick(2000)
-    #
-    # screen = pygame.surfarray.array2d(screen)
-    # cv2.show(screen)
-    # pygame.quit()
-    # sys.exit()
+    clock.tick(config['fps'])
 
     even+=1

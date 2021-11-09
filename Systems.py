@@ -1,16 +1,16 @@
-import pygame
-import os
+import pygame, os
 from Entity import Entity
 from EntityManager import EntityManager
 from math import cos, sin
-# import numpy as np
 from random import randint
+from config import config
 
 # Particle System --------------------------------------------------------------
 class ParticleSystem:
-    def __init__(self, entity_manager: EntityManager, canvas: pygame.Surface):
+    def __init__(self, entity_manager: EntityManager, canvas: pygame.Surface, layer2: pygame.Surface):
         self.entity_manager = entity_manager
         self.canvas = canvas
+        self.canvas2 = layer2
 
     def update(self, dt):
         for id in self.entity_manager.filter(('ParticleComponent',
@@ -20,10 +20,23 @@ class ParticleSystem:
 
             self.entity_manager[id]['PositionComponent']['x'] +=self.entity_manager[id]['VelocityComponent']['x']*20*dt
             self.entity_manager[id]['PositionComponent']['y'] +=self.entity_manager[id]['VelocityComponent']['y']*20*dt
-            pygame.draw.circle(self.canvas, (255,0,255),
+
+
+            if config['bloom']:
+                pygame.draw.circle(self.canvas2, (255,0,0),
+                    (self.entity_manager[id]['PositionComponent']['x'],
+                    self.entity_manager[id]['PositionComponent']['y']),
+                    self.entity_manager[id]['TimerComponent']['timer']*1.3)
+                pygame.draw.circle(self.canvas2, (255,200,200),
+                    (self.entity_manager[id]['PositionComponent']['x'],
+                    self.entity_manager[id]['PositionComponent']['y']),
+                    self.entity_manager[id]['TimerComponent']['timer']*1.2)
+                # self.canvas2.set_alpha(64)
+            pygame.draw.circle(self.canvas, (255,255,255),
                                 (self.entity_manager[id]['PositionComponent']['x'],
                                  self.entity_manager[id]['PositionComponent']['y']),
                                self.entity_manager[id]['TimerComponent']['timer'])
+
 
             self.entity_manager[id]['VelocityComponent']['x'] *= 0.99
             self.entity_manager[id]['VelocityComponent']['y'] *= 0.99
@@ -75,21 +88,37 @@ class ParticleSystem:
 class ParticleSpawnerSystem:
     def __init__(self, em: EntityManager):
         self.entity_manager = em
+        self.elapsed = 0
 
     def update(self, dt):
+        self.elapsed += dt
+        # particleList = self.entity_manager.filter(('ParticleComponent',
+        #                                       'PositionComponent',
+        #                                       'VelocityComponent',
+        #                                       'TimerComponent'))
         for id in self.entity_manager.filter(('ParticleSpawner','Position')):
             e = self.entity_manager[id]
 
 
+
             # Particle ---------------------------------------------------------
-            # if len(self.entity_manager) <= 50:
-            self.entity_manager.add(
-                    Entity(PositionComponent = {'x':e['Position']['x'],
-                                                'y':e['Position']['y']},
-                           VelocityComponent = {'x':randint(-20,20)/10,
-                                                'y':randint(-12,0)-4},
-                           ParticleComponent = True,
-                           TimerComponent    = {'timer':10, 'time':.4}))
+            # while len(particleList) <= 20:
+            if self.elapsed >= config['particles']/100:
+                self.entity_manager.add(
+                        Entity(PositionComponent = {'x':e['Position']['x'],
+                                                    'y':e['Position']['y']},
+                               VelocityComponent = {'x':randint(-500,500)/100,
+                                                    'y':randint(-10,0)-6},
+                               ParticleComponent = True,
+                               TimerComponent    = {'timer':10, 'time':.4}))
+            # self.entity_manager.add(
+            #         Entity(PositionComponent = {'x':e['Position']['x'],
+            #                                     'y':e['Position']['y']},
+            #                VelocityComponent = {'x':randint(-500,500)/100,
+            #                                     'y':randint(0,10)+6},
+            #                ParticleComponent = True,
+            #                TimerComponent    = {'timer':6, 'time':.4}))
+                self.elapsed=0
 
 # class MoveSystem:
 # class RenderSystem:

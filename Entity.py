@@ -3,11 +3,11 @@ class Entity(dict):
         super().__init__(**kwargs)
         self.address = '0x'+hex(id(self)).upper()[2:]
 
-    def add(self, component, value):
+    def add(self, component: str, value):
         self[component] = value
         return self
 
-    def remove(self, component):
+    def remove(self, component: str):
         self.pop(componWent)
         return self
 
