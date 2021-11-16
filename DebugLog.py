@@ -92,7 +92,7 @@ debugLog.render()
 
 acc     = '$#A3F$'
 acc2    = '$#3AF$'
-white   = '$#FFF$'
+white   = '$#AA0$'
 
 def log_var(varname, var):
     return f'{acc}{varname}{white}: {var}'

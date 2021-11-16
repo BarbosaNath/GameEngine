@@ -1,5 +1,6 @@
 import pygame, os
 from Entity import Entity
+from GenericEntities import Particle
 from EntityManager import EntityManager
 from math import cos, sin
 from random import randint
@@ -11,10 +12,10 @@ from config import config
 
 # Particle System --------------------------------------------------------------
 class ParticleSystem:
-    def __init__(self, entity_manager: EntityManager, canvas: pygame.Surface, layer2: pygame.Surface):
+    def __init__(self, entity_manager: EntityManager, canvas: pygame.Surface, bloomLayer: pygame.Surface):
         self.entity_manager = entity_manager
         self.canvas = canvas
-        self.canvas2 = layer2
+        self.bloomLayer = bloomLayer
 
     def update(self, dt):
         for id in self.entity_manager.filter(('Particle', 'Position',
@@ -29,8 +30,7 @@ class ParticleSystem:
 
 
             if config['bloom']:
-                pygame.draw.circle(self.canvas2, (255,  0,  0), pos, timer*1.3)
-                pygame.draw.circle(self.canvas2, (255,200,200), pos, timer*1.2)
+                pygame.draw.circle(self.bloomLayer, (255,120,120), pos, timer)
             pygame.draw.circle(self.canvas, (255,255,255), pos, timer)
 
 
@@ -90,16 +90,12 @@ class ParticleSpawnerSystem:
 
         for id in self.entity_manager.filter(('ParticleSpawner','Position')):
             e = self.entity_manager[id]
+            pos = (e['Position']['x'], e['Position']['y'])
+            vel = (randint(-500,500)/100, randint(-10,0)-6)
 
             # Particle ---------------------------------------------------------
             if self.elapsed >= config['particles']/100:
-                self.entity_manager.add(
-                        Entity(Position = {'x':e['Position']['x'],
-                                                    'y':e['Position']['y']},
-                               Velocity = {'x':randint(-500,500)/100,
-                                                    'y':randint(-10,0)-6},
-                               Particle = True,
-                               Timer    = {'timer':10, 'time':.4}))
+                self.entity_manager.add(Particle().setPos(pos).setVel(vel))
                 self.elapsed=0
 
 # class MoveSystem:

@@ -7,8 +7,12 @@ class Entity(dict):
         self[component] = value
         return self
 
+    def set(self, component: str, value):
+        self[component] = value
+        return self
+
     def remove(self, component: str):
-        self.pop(componWent)
+        self.pop(component)
         return self
 
     def __repr__(self):
@@ -33,3 +37,7 @@ class Entity(dict):
 
     def __getattr__(self, attribute):
         return self[attribute]
+
+# test = Entity()
+# test['test'] = 0
+# print(test.test)
