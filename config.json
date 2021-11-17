@@ -1,0 +1,10 @@
+{
+    "fps": 600,
+    "debug": true,
+    "debug_delay": 2,
+    "particles": 2,
+    "bloom": true,
+    "bloom_type": false,
+    "bloom_rate": 1,
+    "bloom_depth": 1
+}

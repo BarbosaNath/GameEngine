@@ -22,6 +22,14 @@ class EntityManager(dict):
 
         self[id] = entity
 
+    def addID(self, id, entity):
+        self[id] = entity
+        for component in entity:
+            try:self.all[component].append(id)
+            except:
+                self.all[component]=list()
+                self.all[component].append(id)
+
     def remove(self, id):
         self.available.append(id)
 

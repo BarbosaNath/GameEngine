@@ -12,7 +12,7 @@ from config import config
 
 # Particle System --------------------------------------------------------------
 class ParticleSystem:
-    def __init__(self, entity_manager: EntityManager, canvas: pygame.Surface, bloomLayer: pygame.Surface):
+    def __init__(self, entity_manager, canvas, bloomLayer):
         self.entity_manager = entity_manager
         self.canvas = canvas
         self.bloomLayer = bloomLayer
@@ -81,7 +81,7 @@ class ParticleSystem:
 
 
 class ParticleSpawnerSystem:
-    def __init__(self, em: EntityManager):
+    def __init__(self, em):
         self.entity_manager = em
         self.elapsed = 0
 

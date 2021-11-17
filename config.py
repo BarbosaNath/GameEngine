@@ -1,9 +1,19 @@
-config = {
-'fps'        : 600,
-'debug'      : True,
-'debug_delay': 2,
-'particles'  : 2,
-'bloom'      : True,
-'bloom_rate' : 2,
-'bloom_depth': 8,
-}
+import json
+
+config = {}
+
+def save():
+    global config
+    with open('config.json', 'w') as file:
+        json.dump(config, file, indent=4)
+def load():
+    global config
+    with open('config.json', 'r') as file:
+        config = json.load(file)
+
+def reload(id, value):
+    global config
+    load()
+    config[id] = value
+    save()
+load()
