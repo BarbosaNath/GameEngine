@@ -1,3 +1,5 @@
+import pygame
+from postProcessing import Bloom
 def hex(simplehex): # simplehex == '#FFF'
     if isinstance(simplehex, str):
         simplehex = list(simplehex)

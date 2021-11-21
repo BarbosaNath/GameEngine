@@ -86,17 +86,18 @@ class ParticleSpawnerSystem:
         self.elapsed = 0
 
     def update(self, dt):
-        self.elapsed += dt
+        if config['particles'] != 0:
+            self.elapsed += dt
 
-        for id in self.entity_manager.filter(('ParticleSpawner','Position')):
-            e = self.entity_manager[id]
-            pos = (e['Position']['x'], e['Position']['y'])
-            vel = (randint(-500,500)/100, randint(-10,0)-6)
+            for id in self.entity_manager.filter(('ParticleSpawner','Position')):
+                e = self.entity_manager[id]
+                pos = (e['Position']['x'], e['Position']['y'])
+                vel = (randint(-500,500)/100, randint(-10,0)-6)
 
-            # Particle ---------------------------------------------------------
-            if self.elapsed >= config['particles']/100:
-                self.entity_manager.add(Particle().setPos(pos).setVel(vel))
-                self.elapsed=0
+                # Particle ---------------------------------------------------------
+                if self.elapsed >= config['particles']/100:
+                    self.entity_manager.add(Particle().setPos(pos).setVel(vel))
+                    self.elapsed=0
 
 # class MoveSystem:
 # class RenderSystem:

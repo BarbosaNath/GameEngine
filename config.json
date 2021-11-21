@@ -1,8 +1,8 @@
 {
-    "fps": 600,
+    "fps": 80,
     "debug": true,
     "debug_delay": 2,
-    "particles": 2,
+    "particles": 1,
     "bloom": true,
     "bloom_type": false,
     "bloom_rate": 1,
